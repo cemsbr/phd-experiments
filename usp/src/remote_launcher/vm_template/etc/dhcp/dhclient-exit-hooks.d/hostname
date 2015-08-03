@@ -1,0 +1,14 @@
+#!/bin/sh
+#
+# Update hostname from DHCP
+#
+if [ "$reason" != BOUND ] && [ "$reason" != RENEW ] && [ "$reason" != REBIND ] && [ "$reason" != REBOOT ]; then
+   return
+fi
+
+hostname $new_host_name
+echo $new_host_name > /etc/hostname
+#sed -i "s/^\(127\.0\.1\.1.\s*\)\w*$/\1$(hostname)/" /etc/hosts
+#sed -i "s/^\S\+\(\s\+\)\w\+\( # hadoop config\)$/$(host $(hostname) | cut -f 4 -d' ')\1$(hostname)\2/" /etc/hosts
+echo "Hostname: " $new_host_name
+echo "IP: " $new_ip_address
