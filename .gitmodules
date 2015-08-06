@@ -1,0 +1,15 @@
+[submodule "lib/expyrimenter-core"]
+	path = lib/expyrimenter-core
+	url = https://github.com/cemsbr/expyrimenter-core.git
+[submodule "lib/expyrimenter-cloudstack"]
+	path = lib/expyrimenter-cloudstack
+	url = https://github.com/cemsbr/expyrimenter-cloudstack.git
+[submodule "lib/expyrimenter-hadoop"]
+	path = lib/expyrimenter-hadoop
+	url = https://github.com/cemsbr/expyrimenter-hadoop.git
+[submodule "lib/expyrimenter-pushbullet"]
+	path = lib/expyrimenter-pushbullet
+	url = https://github.com/cemsbr/expyrimenter-pushbullet.git
+[submodule "lib/expyrimenter-spark"]
+	path = lib/expyrimenter-spark
+	url = https://github.com/cemsbr/expyrimenter-spark.git
