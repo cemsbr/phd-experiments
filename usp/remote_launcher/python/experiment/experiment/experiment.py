@@ -22,7 +22,7 @@ class Experiment:
         self._input_file = None
 
         # Shared
-        self._dir_exp = dir_home + '/exp03'
+        self._dir_exp = dir_home + '/exp04'
         dir_output = self._dir_exp + '/outputs'
         self._slaves = []
         self._logger = ExpyLogger.getLogger('experiment')
@@ -107,7 +107,7 @@ class Experiment:
 
     def _get_slaves(self):
         """When a VM is started, its logs are deleted."""
-        # Hostname resolutions fail while starting VMs
+        # Hostname resolutions fail while starting VMs, so we wait.
         self._wait()
         slaves = self._pool.get(self.slave_amount)
 
@@ -147,7 +147,6 @@ class Experiment:
 
     def _bootstrap_hosts(self, hosts):
         self._systems_do(lambda s: s.clean_logs(hosts))
-
         cmd = 'VM={} make --quiet bootstrap-vm'
         executor = Executor()
         for host in hosts:
