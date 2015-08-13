@@ -1,5 +1,5 @@
 #!/usr/bin/env python3.4
-from experimentusp import ExperimentUSP
+from experiment import ExperimentUSP
 from expyrimenter.plugins.pushbullet import Pushbullet
 import sys
 
@@ -14,9 +14,9 @@ exp = ExperimentUSP()
 
 exp.set_app('top_contributors.py')
 exp.hdfs_file = '/enwiki.json'
-exp.slave_amounts = [4, 8, 16, 32, 64]
-exp.dfs_replications = {4: 1, 8: 2, 16: 3, 32: 3, 64: 3}
-exp.repetitions = 2
+exp.slave_amounts = [1, 2, 4]
+exp.dfs_replications = {1: 1, 2: 2, 4: 3}
+exp.repetitions = 10
 exp.slave_amount = FIRST_SLAVE_AMOUNT
 exp.repetition = FIRST_REPETITION
 

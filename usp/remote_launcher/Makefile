@@ -1,5 +1,6 @@
 SHELL=/bin/bash
 
+exp_folder=exp04
 master_ip=hadoop0
 
 help:
@@ -16,19 +17,19 @@ bootstrap-all:
 
 bootstrap-vm:
 	rsync -qrc vm_template/home/hadoop/ $(VM):.
-	ssh $(VM) exp03/install.sh
+	ssh $(VM) $(exp_folder)/install.sh
 	scp -qr hadoop_config/* $(VM):hadoop/hadoop/
 	scp -qr spark_config/* $(VM):spark/spark/
 
 master:
-	scp top_contributors.py $(master_ip):exp03/
+	scp top_contributors.py $(master_ip):$(exp_folder)/
 
 launch:
-	-./exp03.py $(SLAVES) $(REP) 2>experiment.log
-#	./mobile_finished.py
+	-./run.py $(SLAVES) $(REP) 2>experiment.log
+	scripts/mobile_finished.py
 
 log_tail:
 	tail -fn +1 experiment.log | grcat conf.expyrimenter
 
 log_watch:
-	./mobile_log_watcher.py
+	scripts/mobile_log_watcher.py
