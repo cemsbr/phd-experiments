@@ -1,8 +1,8 @@
 #!/bin/bash
-PYTHONPATH='python/experiment'
-PYTHONPATH="$PYTHONPATH:python/expyrimenter-core"
-PYTHONPATH="$PYTHONPATH:python/expyrimenter-hadoop"
-PYTHONPATH="$PYTHONPATH:python/expyrimenter-pushbullet"
-PYTHONPATH="$PYTHONPATH:python/expyrimenter-spark"
-PYTHONPATH="$PYTHONPATH:python/expyrimenter-cloudstack"
+PYTHONPATH="$PWD/python/experiment"
+PYTHONPATH="$PYTHONPATH:$PWD/python/expyrimenter-core"
+PYTHONPATH="$PYTHONPATH:$PWD/python/expyrimenter-hadoop"
+PYTHONPATH="$PYTHONPATH:$PWD/python/expyrimenter-pushbullet"
+PYTHONPATH="$PYTHONPATH:$PWD/python/expyrimenter-spark"
+PYTHONPATH="$PYTHONPATH:$PWD/python/expyrimenter-cloudstack"
 export PYTHONPATH
