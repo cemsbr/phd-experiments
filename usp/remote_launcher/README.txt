@@ -17,6 +17,6 @@ StrictHostKeyChecking no
 
 # package (gateway)
 - python3-requests
-- ipython3
+- ipython3 (optional)
 - grc
 - make
