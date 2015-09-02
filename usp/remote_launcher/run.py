@@ -5,7 +5,8 @@ import sys
 
 
 if len(sys.argv) != 3:
-    raise Exception('Inform current slave amount and repetition number.')
+    raise Exception('Inform current slave amount and repetition number. E.g.:\n'
+                    '%s 1 0' % sys.argv[0])
 else:
     FIRST_SLAVE_AMOUNT = int(sys.argv[1])
     FIRST_REPETITION = int(sys.argv[2])
@@ -13,7 +14,7 @@ else:
 exp = ExperimentUSP()
 
 exp.set_app('top_contributors.py')
-exp.hdfs_file = '/enwiki.json'
+exp.hdfs_input = '/enwiki.json'
 exp.slave_amounts = [1, 2, 4]
 exp.dfs_replications = {1: 1, 2: 2, 4: 3}
 exp.repetitions = 10

@@ -6,24 +6,31 @@ import time
 
 
 class Experiment:
-    def __init__(self, master, dir_home):
+    def __init__(self, master, dir_home, input_host, pool):
+        # Hard-coded values
+        input_file = dir_home + '/data/enwiki-01G.spl.json.bz2'  # @input_host
+        dir_exp = dir_home + '/exp04'
+        dir_output = dir_exp + '/outputs'
+        self._output_file = dir_output + \
+            '/spark-submit/slaves{:02d}_rep{:02d}_{}.txt'
+        self._blocks_file = dir_output + \
+            '/hdfs-blocks/slaves{:02d}_rep{:02d}.txt'
+
         # User defined
         self._app = None  # use self.set_app()
-        self.hdfs_file = None
+        self.hdfs_input = None  # app input, e.g. /enwiki.json
         self.slave_amounts = []
-        self.slave_amount = 0
         self.dfs_replications = {}
         self.repetitions = 0
-        self.repetition = 0
+        # Resuming experiment:
+        self.slave_amount = 0  # current slave amount
+        self.repetition = 0  # current repetition (from 0)
 
-        # Subclass
-        self._pool = None
-        self._input_host = None
-        self._input_file = None
+        self.dir_exp = dir_exp
+        self._input_host = input_host
+        self._input_file = input_file
+        self._pool = pool
 
-        # Shared
-        self._dir_exp = dir_home + '/exp04'
-        dir_output = self._dir_exp + '/outputs'
         self._slaves = []
         self._logger = ExpyLogger.getLogger('experiment')
 
@@ -31,19 +38,15 @@ class Experiment:
         dir_spark = dir_home + '/spark/spark'
         self._spark = Spark(home=dir_spark, master=master)
         self._spark_ex = self._spark.executor
-        self._output_file = dir_output + \
-            '/spark-submit/slaves{:02d}_rep{:02d}_{}.txt'
 
         # HDFS
         dir_hadoop = dir_home + '/hadoop/hadoop'
         self._hdfs = HDFS(home=dir_hadoop, name_node=master)
         self._hdfs_ex = self._hdfs.executor
         self._dir_hadoop_tmp = dir_home + '/hadoop-tmp'
-        self._blocks_file = dir_output + \
-            '/hdfs-blocks/slaves{:02d}_rep{:02d}.txt'
 
     def set_app(self, basename):
-        self._app = '{}/{}'.format(self._dir_exp, basename)
+        self._app = '{}/{}'.format(self.dir_exp, basename)
 
     def _set_slaves(self, slaves):
         self._slaves = slaves
@@ -136,14 +139,14 @@ class Experiment:
 
     def _save_blocks_info(self):
         output = self._blocks_file.format(len(self._slaves), self.repetition)
-        self._hdfs.save_block_locations(self.hdfs_file, output)
+        self._hdfs.save_block_locations(self.hdfs_input, output)
 
     def _upload_input(self):
         self._logger.info('%d slaves, repetition %d.', self.slave_amount,
                           self.repetition)
         pipe = 'pbzip2 -dc ' + self._input_file
         repl = self.dfs_replications[self.slave_amount]
-        self._hdfs.put_from_pipe(self._input_host, pipe, self.hdfs_file, repl)
+        self._hdfs.put_from_pipe(self._input_host, pipe, self.hdfs_input, repl)
 
     def _bootstrap_hosts(self, hosts):
         self._systems_do(lambda s: s.clean_logs(hosts))
