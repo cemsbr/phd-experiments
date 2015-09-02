@@ -15,6 +15,8 @@ bootstrap-all:
 	    VM=$$host make bootstrap-vm& \
 	    done
 
+# FIXME: create folder as needed. Now, non-launcher VMs will have some empty
+# folders from template.
 bootstrap-vm:
 	rsync -qrc vm_template/home/hadoop/ $(VM):.
 	ssh $(VM) $(exp_folder)/install.sh

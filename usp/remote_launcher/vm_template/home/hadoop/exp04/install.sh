@@ -60,7 +60,7 @@ fi
 
 ## Part II ##
 
-DIR="info-$(hostname)"
+DIR="outputs/vm-info/$(hostname)"
 rm -rf $DIR
 mkdir $DIR
 cd $DIR
