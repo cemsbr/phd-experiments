@@ -1,6 +1,6 @@
 SHELL=/bin/bash
 
-exp_folder=exp04
+exp_folder=exp05
 master_ip=hadoop0
 
 help:
@@ -19,7 +19,7 @@ bootstrap-all:
 # folders from template.
 bootstrap-vm:
 	rsync -qrc vm_template/home/hadoop/ $(VM):.
-	ssh $(VM) $(exp_folder)/install.sh
+	ssh $(VM) "cd $(exp_folder); ./install.sh"
 	scp -qr hadoop_config/* $(VM):hadoop/hadoop/
 	scp -qr spark_config/* $(VM):spark/spark/
 

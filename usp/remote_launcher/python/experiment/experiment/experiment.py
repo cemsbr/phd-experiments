@@ -7,10 +7,13 @@ import time
 
 class Experiment:
     def __init__(self, master, dir_home, input_host, pool):
+        self._dir_home = dir_home
+        self._input_host = input_host
+        self._pool = pool
+
         # Hard-coded values
-        input_file = dir_home + '/data/enwiki-01G.spl.json.bz2'  # @input_host
-        dir_exp = dir_home + '/exp04'
-        dir_output = dir_exp + '/outputs'
+        self._dir_exp = dir_home + '/exp05'
+        dir_output = self._dir_exp + '/outputs'
         self._output_file = dir_output + \
             '/spark-submit/slaves{:02d}_rep{:02d}_{}.txt'
         self._blocks_file = dir_output + \
@@ -18,6 +21,7 @@ class Experiment:
 
         # User defined
         self._app = None  # use self.set_app()
+        self._input_file = None  # use self.set_input_file()
         self.hdfs_input = None  # app input, e.g. /enwiki.json
         self.slave_amounts = []
         self.dfs_replications = {}
@@ -25,11 +29,6 @@ class Experiment:
         # Resuming experiment:
         self.slave_amount = 0  # current slave amount
         self.repetition = 0  # current repetition (from 0)
-
-        self.dir_exp = dir_exp
-        self._input_host = input_host
-        self._input_file = input_file
-        self._pool = pool
 
         self._slaves = []
         self._logger = ExpyLogger.getLogger('experiment')
@@ -46,14 +45,17 @@ class Experiment:
         self._dir_hadoop_tmp = dir_home + '/hadoop-tmp'
 
     def set_app(self, basename):
-        self._app = '{}/{}'.format(self.dir_exp, basename)
+        self._app = '{}/{}'.format(self._dir_exp, basename)
+
+    def set_input_file(self, home_relative_path):
+        self._input_file = '{}/{}'.format(self._dir_home, home_relative_path)
 
     def _set_slaves(self, slaves):
         self._slaves = slaves
         self._systems_do(lambda s: s.set_slaves(slaves))
 
     def run(self):
-        self._stop()
+        self.stop()
         self._restart_history_server()
         slave_amounts = [n for n in self.slave_amounts
                          if n >= self.slave_amount]
@@ -64,7 +66,6 @@ class Experiment:
                 self._spark_ex.add_barrier()
                 self._run_once()
             self.repetition = 0
-            self._mobile()
 
     def _restart_history_server(self):
         self._spark.stop_history_server()
@@ -80,7 +81,7 @@ class Experiment:
         self._hdfs_ex.add_barrier()
         self._save_blocks_info()
         self._submit_app()
-        self._stop()
+        self.stop()
 
     def _submit_app(self):
         """Block while app is running."""
@@ -92,18 +93,16 @@ class Experiment:
         self._spark.submit(self._app, stdout, stderr)
         self._spark_ex.wait()
 
-    def _stop(self):
+    def stop(self):
         """Stop systems and clean temporary files."""
+        self._systems_do(lambda s: s.executor.add_barrier())
         self._systems_do(lambda s: s.stop())
         self._spark_ex.add_barrier()
         self._spark.clean_tmp()
 
     def finish(self):
-        self._systems_do(lambda s: s.executor.add_barrier())
-        self._spark.stop()
-        self._spark_ex.add_barrier()
-        self._spark.clean_tmp()
-        self._hdfs.stop()
+        """(blocking) Stop systems, clean temp files and shutdown pool."""
+        self.stop()
         self._pool.stop()
         self._pool.wait()
         self._wait()

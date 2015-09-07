@@ -5,4 +5,4 @@ rsync:
 	    --exclude '.gitkeep' \
 	    --exclude '__pycache__/' \
 	    --exclude '*.log' \
-	    remote_launcher nuvemusp:exp04/
+	    remote_launcher nuvemusp:exp05/

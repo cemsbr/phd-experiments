@@ -3,10 +3,13 @@ from pathlib import Path
 
 
 class LogDownloader:
-    def __init__(self, launcher_host, master,
+    def __init__(self, launcher_host, master, dir_exp,
                  slaves=None,
                  local_root='/tmp/logs',
                  executor=None):
+        """
+        :param str dir_exp: Relative to home folder
+        """
         self._local_root = local_root
         self.executor = executor if executor else Executor()
 
@@ -15,7 +18,7 @@ class LogDownloader:
 
         self._download_list = [{
             'host': launcher_host,
-            'rmt_root': '/home/hadoop/exp04/remote_launcher',
+            'rmt_root': '/home/hadoop/%s/remote_launcher' % dir_exp,
             'rmt_files': 'experiment.log',
             'title': 'experiment.log',
             'lcl_dir': 'launcher'
@@ -35,7 +38,7 @@ class LogDownloader:
                 'lcl_dir': 'hadoop-logs/' + host
             }, {
                 'host': host,
-                'rmt_root': '/home/hadoop/exp04/outputs',
+                'rmt_root': '/home/hadoop/%s/outputs' % dir_exp,
                 'rmt_files': '*',
                 'title': 'output folder',
                 'lcl_dir': '.'
