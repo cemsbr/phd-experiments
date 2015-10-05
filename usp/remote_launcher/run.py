@@ -4,9 +4,6 @@ from expyrimenter.plugins.pushbullet import Pushbullet
 import sys
 
 inputs = [
-    'data/enwiki-128M.spl.json.bz2',
-    'data/enwiki-[12]*M.spl.json.bz2',
-    'data/enwiki-*M.spl.json.bz2',
     'data/enwiki-*M.spl.json.bz2 data/enwiki-01G.spl.json.bz2'
 ]
 
@@ -21,8 +18,8 @@ else:
 exp = ExperimentUSP()
 exp.set_app('top_contributors.py')
 exp.hdfs_input = '/enwiki.json'
-exp.slave_amounts = [1]
-exp.dfs_replications = {1: 1}
+exp.slave_amounts = [1, 2, 3]
+exp.dfs_replications = {1: 1, 2: 2, 3: 3}
 exp.repetitions = 10
 
 pb = Pushbullet()

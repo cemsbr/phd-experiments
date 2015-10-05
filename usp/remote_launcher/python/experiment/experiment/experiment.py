@@ -12,7 +12,7 @@ class Experiment:
         self._pool = pool
 
         # Hard-coded values
-        self._dir_exp = dir_home + '/exp05'
+        self._dir_exp = dir_home + '/exp06'
         dir_output = self._dir_exp + '/outputs'
         self._output_file = dir_output + \
             '/spark-submit/slaves{:02d}_rep{:02d}_{}.txt'

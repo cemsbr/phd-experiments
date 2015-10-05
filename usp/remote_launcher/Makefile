@@ -1,6 +1,6 @@
 SHELL=/bin/bash
 
-exp_folder=exp05
+exp_folder=exp06
 master_ip=hadoop0
 
 help:

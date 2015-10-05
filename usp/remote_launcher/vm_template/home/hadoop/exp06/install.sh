@@ -18,7 +18,7 @@ SPARKF="$SPARKD.tgz"
 
 # Legacy experiments
 cd $HOME
-for i in 2 3; do
+for i in $(seq 1 5); do
     if [ -d exp0$i ]; then
         tar cjf exp0$i.tar.bz2 exp0$i
         rm -rf exp0$i
