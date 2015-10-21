@@ -9,16 +9,16 @@
 #
 # ATTENTION: will remove $HOME/hadoop and $HOME/spark before installing!
 #
-HADOOPV='2.6.0'
+HADOOPV='2.7.1'
 HADOOPD="hadoop-$HADOOPV"
 HADOOPF="$HADOOPD.tar.gz"
-SPARKV='1.3.1'
+SPARKV='1.5.1'
 SPARKD="spark-$SPARKV-bin-hadoop2.6"
 SPARKF="$SPARKD.tgz"
 
 # Legacy experiments
 cd $HOME
-for i in $(seq 1 5); do
+for i in $(seq 1 6); do
     if [ -d exp0$i ]; then
         tar cjf exp0$i.tar.bz2 exp0$i
         rm -rf exp0$i
@@ -58,7 +58,7 @@ if [ ! -d $HOME/spark/$SPARKD ]; then
     cd - >/dev/null
 fi
 
-## Part II ##
+## Part II: Save information about the VM in current folder ##
 
 DIR="outputs/vm-info/$(hostname)"
 rm -rf $DIR
@@ -69,4 +69,5 @@ uname -a >uname
 lsb_release -a >lsb_release 2>&1
 java -version >java 2>&1
 free -m >free-m
+python --version >python 2>&1
 cd - >/dev/null

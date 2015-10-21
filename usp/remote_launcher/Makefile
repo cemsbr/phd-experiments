@@ -1,7 +1,7 @@
 SHELL=/bin/bash
 
 exp_folder=exp06
-master_ip=hadoop0
+master=hadoop0
 
 help:
 	@echo -e "VM=host make bootstrap-vm\n\
@@ -24,7 +24,7 @@ bootstrap-vm:
 	scp -qr spark_config/* $(VM):spark/spark/
 
 master:
-	scp top_contributors.py $(master_ip):$(exp_folder)/
+	scp top_contributors.py $(master):$(exp_folder)/
 
 launch:
 	-./run.py $(SLAVES) $(REP) 2>experiment.log
