@@ -1,6 +1,6 @@
 SHELL=/bin/bash
 
-exp_folder=exp06
+exp_folder=exp07
 master=hadoop0
 
 help:
@@ -24,7 +24,8 @@ bootstrap-vm:
 	scp -qr spark_config/* $(VM):spark/spark/
 
 master:
-	scp top_contributors.py $(master):$(exp_folder)/
+	ssh $(master) "test -d $(exp_folder) || mkdir $(exp_folder)"
+	rsync -qrc hibench_config/* $(master):hibench/hibench/
 
 launch:
 	-./run.py $(SLAVES) $(REP) 2>experiment.log

@@ -40,7 +40,7 @@
 # - SPARK_WORKER_OPTS, to set config properties only for the worker (e.g. "-Dx=y")
 # - SPARK_DAEMON_MEMORY, to allocate to the master, worker and history server themselves (default: 1g).
 # - SPARK_HISTORY_OPTS, to set config properties only for the history server (e.g. "-Dx=y")
-SPARK_HISTORY_OPTS='-Dspark.history.fs.logDirectory=/home/hadoop/exp06/outputs/spark-history'
+SPARK_HISTORY_OPTS='-Dspark.history.fs.logDirectory=/home/hadoop/exp07/outputs/spark-history'
 # - SPARK_SHUFFLE_OPTS, to set config properties only for the external shuffle service (e.g. "-Dx=y")
 # - SPARK_DAEMON_JAVA_OPTS, to set config properties for all daemons (e.g. "-Dx=y")
 # - SPARK_PUBLIC_DNS, to set the public dns name of the master or workers

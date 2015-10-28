@@ -1,8 +1,11 @@
+import time
+from shlex import quote
+
 from expyrimenter.plugins.yarn import HDFS
 from expyrimenter.plugins.spark import Spark
-from expyrimenter.core import ExpyLogger, Executor, Shell
+from expyrimenter.core import ExpyLogger, Executor, Shell, SSH
 from expyrimenter.plugins.pushbullet import Pushbullet
-import time
+from .hibench import HiBench
 
 
 class Experiment:
@@ -12,7 +15,7 @@ class Experiment:
         self._pool = pool
 
         # Hard-coded values
-        self._dir_exp = dir_home + '/exp06'
+        self._dir_exp = dir_home + '/exp07'
         dir_output = self._dir_exp + '/outputs'
         self._output_file = dir_output + \
             '/spark-submit/slaves{:02d}_rep{:02d}_{}.txt'
@@ -24,7 +27,6 @@ class Experiment:
         self._input_file = None  # use self.set_input_file()
         self.hdfs_input = None  # app input, e.g. /enwiki.json
         self.slave_amounts = []
-        self.dfs_replications = {}
         self.repetitions = 0
         # Resuming experiment:
         self.slave_amount = 0  # current slave amount
@@ -44,6 +46,12 @@ class Experiment:
         self._hdfs_ex = self._hdfs.executor
         self._dir_hadoop_tmp = dir_home + '/hadoop-tmp'
 
+        # HiBench
+        dir_hibench = dir_home + '/hibench/hibench'
+        self._hibench = HiBench(dir_hibench, master)
+
+        self.master = master
+
     def set_app(self, basename):
         self._app = '{}/{}'.format(self._dir_exp, basename)
 
@@ -53,19 +61,21 @@ class Experiment:
     def _set_slaves(self, slaves):
         self._slaves = slaves
         self._systems_do(lambda s: s.set_slaves(slaves))
+        self._hibench.set_parallelism(len(slaves) * 2, 'sort')
 
     def run(self):
         self.stop()
         self._restart_history_server()
-        slave_amounts = [n for n in self.slave_amounts
-                         if n >= self.slave_amount]
+        slave_amounts = (n for n in self.slave_amounts
+                         if n >= self.slave_amount)
         for self.slave_amount in slave_amounts:
-            self._get_slaves()
+            self._prepare_slaves()
             for self.repetition in range(self.repetition, self.repetitions):
                 self._hdfs_ex.add_barrier()
                 self._spark_ex.add_barrier()
                 self._run_once()
             self.repetition = 0
+            self._mobile()
 
     def _restart_history_server(self):
         self._spark.stop_history_server()
@@ -89,9 +99,11 @@ class Experiment:
                                           'stdout')
         stderr = self._output_file.format(self.slave_amount, self.repetition,
                                           'stderr')
-        self._wait()
-        self._spark.submit(self._app, stdout, stderr)
-        self._spark_ex.wait()
+        cmd = '{} 1>{} 2>{}'.format(quote(self._app), quote(stdout),
+                                    quote(stderr))
+        ssh = SSH(self.master, cmd, stdout=True, stderr=True)
+        self.wait()
+        ssh.run()
 
     def stop(self):
         """Stop systems and clean temporary files."""
@@ -103,14 +115,14 @@ class Experiment:
     def finish(self):
         """(blocking) Stop systems, clean temp files and shutdown pool."""
         self.stop()
+        self.wait()
         self._pool.stop()
         self._pool.wait()
-        self._wait()
 
-    def _get_slaves(self):
+    def _prepare_slaves(self):
         """When a VM is started, its logs are deleted."""
         # Hostname resolutions fail while starting VMs, so we wait.
-        self._wait()
+        self.wait()
         slaves = self._pool.get(self.slave_amount)
 
         self._set_slaves(slaves)
@@ -125,7 +137,7 @@ class Experiment:
             self._clean_hdfs()
         else:
             self._hdfs.start()
-        self._wait()
+        self.wait()
         time.sleep(60)
 
     def _clean_hdfs(self):
@@ -144,7 +156,7 @@ class Experiment:
         self._logger.info('%d slaves, repetition %d.', self.slave_amount,
                           self.repetition)
         pipe = 'pbzip2 -dc ' + self._input_file
-        repl = self.dfs_replications[self.slave_amount]
+        repl = min(self.slave_amount, 3)
         self._hdfs.put_from_pipe(self._input_host, pipe, self.hdfs_input, repl)
 
     def _bootstrap_hosts(self, hosts):
@@ -155,8 +167,9 @@ class Experiment:
             executor.run(Shell(cmd.format(host), 'bootstrap ' + host))
         executor.shutdown()  # blocking
 
-    def _wait(self):
+    def wait(self):
         self._systems_do(lambda s: s.executor.wait())
+        self._hibench.executor.wait()
 
     def _systems_do(self, func):
         func(self._spark)

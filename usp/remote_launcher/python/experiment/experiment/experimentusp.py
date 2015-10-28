@@ -6,12 +6,11 @@ class ExperimentUSP(Experiment):
     """All nodes but slaves must be started before running the experiment."""
     def __init__(self):
         # Hard-coded values
-        slave_amount = 5
         master = 'hadoop0'
         dir_home = '/home/hadoop'
         input_host = 'hadoop200'
 
-        pool = get_slave_pool(slave_amount)
+        pool = get_slave_pool(128)
         super().__init__(master, dir_home, input_host, pool)
 
 

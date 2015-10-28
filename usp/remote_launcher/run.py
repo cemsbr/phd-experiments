@@ -1,11 +1,7 @@
 #!/usr/bin/env python3.4
+import sys
 from experiment import ExperimentUSP
 from expyrimenter.plugins.pushbullet import Pushbullet
-import sys
-
-inputs = [
-    'data/enwiki-*M.spl.json.bz2 data/enwiki-01G.spl.json.bz2'
-]
 
 if len(sys.argv) != 3:
     raise Exception('Inform current slave amount and repetition number. E.g.:\n'
@@ -16,26 +12,18 @@ else:
 
 # Common settings for all input sizes
 exp = ExperimentUSP()
-exp.set_app('top_contributors.py')
-exp.hdfs_input = '/enwiki.json'
-exp.slave_amounts = [1, 2, 3]
-exp.dfs_replications = {1: 1, 2: 2, 3: 3}
+exp.set_app('../hibench/hibench/workloads/sort/spark/scala/bin/run.sh')
+exp.hdfs_input = '/HiBench/Sort/Input/part-m-00000'
 exp.repetitions = 10
 
-pb = Pushbullet()
-
 # We might have already run some repetitions for the first input file
-for input in inputs:
-    exp.set_input_file(input)
-    exp.slave_amount = FIRST_SLAVE_AMOUNT
-    exp.repetition = FIRST_REPETITION
-    exp.run()
+exp.slave_amount = FIRST_SLAVE_AMOUNT
+exp.repetition = FIRST_REPETITION
 
-    exp.slave_amount = 1
-    exp.repetition = 0
-
-    msg = '{:d} reps with {} done.'.format(exp.repetitions, input)
-    pb.send_note('Experiment at USP', msg)
-
+exp.slave_amounts = [1, 2, 4, 8, 12, 16]
+exp.set_input_file('data/sort_huge.bz2')
+exp.run()
 exp.finish()
+
+pb = Pushbullet()
 pb.send_note('Experiment at USP', 'All done!')

@@ -19,9 +19,15 @@ class LogDownloader:
         self._download_list = [{
             'host': launcher_host,
             'rmt_root': '/home/hadoop/%s/remote_launcher' % dir_exp,
-            'rmt_files': 'experiment.log',
+            'rmt_files': 'experiment*.log',
             'title': 'experiment.log',
             'lcl_dir': 'launcher'
+        }, {
+            'host': master,
+            'rmt_root': '/home/hadoop/hibench/hibench',
+            'rmt_files': 'report',
+            'title': 'output folder',
+            'lcl_dir': 'hibench'
         }]
         for host in slaves + [master]:
             self._download_list.extend([{
@@ -57,7 +63,7 @@ class LogDownloader:
         """Target dir must not exist. If it does, throws FileExistsError"""
         root = Path(self._local_root)
         root.mkdir(parents=True)
-        for dir in [d['lcl_dir'] for d in self._download_list]:
-            if dir != '.':
-                path = '{}/{}'.format(self._local_root, dir)
+        for _dir in (d['lcl_dir'] for d in self._download_list):
+            if _dir != '.':
+                path = '{}/{}'.format(self._local_root, _dir)
                 Path(path).mkdir(parents=True)
