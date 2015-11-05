@@ -19,8 +19,7 @@ class Experiment:
         dir_output = self._dir_exp + '/outputs'
         self._output_file = dir_output + \
             '/spark-submit/slaves{:02d}_rep{:02d}_{}.txt'
-        self._blocks_file = dir_output + \
-            '/hdfs-blocks/slaves{:02d}_rep{:02d}.txt'
+        self._blocks_file = dir_output + '/hdfs-blocks/slaves{:02d}.txt'
 
         # User defined
         self._app = None  # use self.set_app()
@@ -75,7 +74,7 @@ class Experiment:
                 self._spark_ex.add_barrier()
                 self._run_once()
             self.repetition = 0
-            self._mobile()
+            #self._mobile()
 
     def _restart_history_server(self):
         self._spark.stop_history_server()
@@ -88,8 +87,6 @@ class Experiment:
 
     def _run_once(self):
         self._start()
-        self._hdfs_ex.add_barrier()
-        self._save_blocks_info()
         self._submit_app()
         self.stop()
 
@@ -149,7 +146,7 @@ class Experiment:
         self._upload_input()
 
     def _save_blocks_info(self):
-        output = self._blocks_file.format(len(self._slaves), self.repetition)
+        output = self._blocks_file.format(len(self._slaves))
         self._hdfs.save_block_locations(self.hdfs_input, output)
 
     def _upload_input(self):
@@ -158,6 +155,8 @@ class Experiment:
         pipe = 'pbzip2 -dc ' + self._input_file
         repl = min(self.slave_amount, 3)
         self._hdfs.put_from_pipe(self._input_host, pipe, self.hdfs_input, repl)
+        self._hdfs_ex.add_barrier()
+        self._save_blocks_info()
 
     def _bootstrap_hosts(self, hosts):
         self._systems_do(lambda s: s.clean_logs(hosts))

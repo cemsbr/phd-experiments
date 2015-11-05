@@ -16,5 +16,5 @@ class ExperimentUSP(Experiment):
 
 def get_slave_pool(amount):
     """Return a pool of available workers."""
-    slaves = tuple(['hadoop{:d}'.format(i) for i in range(1, amount)])
+    slaves = tuple(['hadoop{:d}'.format(i) for i in range(1, amount + 1)])
     return Pool(slaves)

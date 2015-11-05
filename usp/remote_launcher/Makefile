@@ -28,7 +28,7 @@ master:
 	rsync -qrc hibench_config/* $(master):hibench/hibench/
 
 launch:
-	-./run.py $(SLAVES) $(REP) 2>experiment.log
+	-./run.py $(SLAVES) $(INPUT) $(REP) 2>>experiment.log
 	scripts/mobile_finished.py
 
 log_tail:
