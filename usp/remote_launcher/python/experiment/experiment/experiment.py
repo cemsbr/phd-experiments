@@ -12,7 +12,7 @@ class Experiment:
     def __init__(self, master, dir_home, input_host, pool):
         self._dir_home = dir_home
         self._input_host = input_host
-        self._pool = pool
+        self.pool = pool
 
         # Hard-coded values
         self._dir_exp = dir_home + '/exp07'
@@ -36,18 +36,18 @@ class Experiment:
 
         # Spark
         dir_spark = dir_home + '/spark/spark'
-        self._spark = Spark(home=dir_spark, master=master)
-        self._spark_ex = self._spark.executor
+        self.spark = Spark(home=dir_spark, master=master)
+        self.spark_ex = self.spark.executor
 
         # HDFS
         dir_hadoop = dir_home + '/hadoop/hadoop'
-        self._hdfs = HDFS(home=dir_hadoop, name_node=master)
-        self._hdfs_ex = self._hdfs.executor
+        self.hdfs = HDFS(home=dir_hadoop, name_node=master)
+        self.hdfs_ex = self.hdfs.executor
         self._dir_hadoop_tmp = dir_home + '/hadoop-tmp'
 
         # HiBench
         dir_hibench = dir_home + '/hibench/hibench'
-        self._hibench = HiBench(dir_hibench, master)
+        self.hibench = HiBench(dir_hibench, master)
 
         self.master = master
 
@@ -60,7 +60,7 @@ class Experiment:
     def _set_slaves(self, slaves):
         self._slaves = slaves
         self._systems_do(lambda s: s.set_slaves(slaves))
-        self._hibench.set_parallelism(len(slaves) * 2, 'sort')
+        self.hibench.set_parallelism(len(slaves) * 2, 'sort')
 
     def run(self):
         self.stop()
@@ -70,16 +70,16 @@ class Experiment:
         for self.slave_amount in slave_amounts:
             self._prepare_slaves()
             for self.repetition in range(self.repetition, self.repetitions):
-                self._hdfs_ex.add_barrier()
-                self._spark_ex.add_barrier()
+                self.hdfs_ex.add_barrier()
+                self.spark_ex.add_barrier()
                 self._run_once()
             self.repetition = 0
             #self._mobile()
 
     def _restart_history_server(self):
-        self._spark.stop_history_server()
-        self._spark_ex.add_barrier()
-        self._spark.start_history_server()
+        self.spark.stop_history_server()
+        self.spark_ex.add_barrier()
+        self.spark.start_history_server()
 
     def _mobile(self):
         body = 'Slave amount {:d} finished.'.format(self.slave_amount)
@@ -106,56 +106,59 @@ class Experiment:
         """Stop systems and clean temporary files."""
         self._systems_do(lambda s: s.executor.add_barrier())
         self._systems_do(lambda s: s.stop())
-        self._spark_ex.add_barrier()
-        self._spark.clean_tmp()
+        self.spark_ex.add_barrier()
+        self.spark.clean_tmp()
 
     def finish(self):
         """(blocking) Stop systems, clean temp files and shutdown pool."""
         self.stop()
         self.wait()
-        self._pool.stop()
-        self._pool.wait()
+        self.pool.stop()
+        self.pool.wait()
 
     def _prepare_slaves(self):
         """When a VM is started, its logs are deleted."""
         # Hostname resolutions fail while starting VMs, so we wait.
         self.wait()
-        slaves = self._pool.get(self.slave_amount)
+        slaves = self.pool.get(self.slave_amount)
 
         self._set_slaves(slaves)
         if self.repetition == 0:
             # Bootstrap recently started nodes
-            self._bootstrap_hosts(self._pool.last_started)
+            self._bootstrap_hosts(self.pool.last_started)
 
     def _start(self):
-        self._spark.start()
+        self.spark.start()
         # Format namenode
         if self.repetition == 0:
             self._clean_hdfs()
         else:
-            self._hdfs.start()
+            self.hdfs.start()
         self.wait()
         time.sleep(60)
 
+    def format_hdfs(self):
+        self.hdfs.format(self._dir_hadoop_tmp)
+
     def _clean_hdfs(self):
-        self._hdfs.format(self._dir_hadoop_tmp)
-        self._hdfs_ex.add_barrier()
-        self._hdfs.start()
-        self._hdfs_ex.wait()
+        self.format_hdfs()
+        self.hdfs_ex.add_barrier()
+        self.hdfs.start()
+        self.hdfs_ex.wait()
         time.sleep(60)
         self._upload_input()
 
     def _save_blocks_info(self):
         output = self._blocks_file.format(len(self._slaves))
-        self._hdfs.save_block_locations(self.hdfs_input, output)
+        self.hdfs.save_block_locations(self.hdfs_input, output)
 
     def _upload_input(self):
         self._logger.info('%d slaves, repetition %d.', self.slave_amount,
                           self.repetition)
         pipe = 'pbzip2 -dc ' + self._input_file
         repl = min(self.slave_amount, 3)
-        self._hdfs.put_from_pipe(self._input_host, pipe, self.hdfs_input, repl)
-        self._hdfs_ex.add_barrier()
+        self.hdfs.put_from_pipe(self._input_host, pipe, self.hdfs_input, repl)
+        self.hdfs_ex.add_barrier()
         self._save_blocks_info()
 
     def _bootstrap_hosts(self, hosts):
@@ -168,8 +171,8 @@ class Experiment:
 
     def wait(self):
         self._systems_do(lambda s: s.executor.wait())
-        self._hibench.executor.wait()
+        self.hibench.executor.wait()
 
     def _systems_do(self, func):
-        func(self._spark)
-        func(self._hdfs)
+        func(self.spark)
+        func(self.hdfs)
