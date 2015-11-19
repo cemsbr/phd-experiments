@@ -1,6 +1,6 @@
 SHELL=/bin/bash
 
-exp_folder=exp07
+exp_folder=exp08
 master=hadoop0
 
 help:

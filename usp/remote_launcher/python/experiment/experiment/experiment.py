@@ -15,7 +15,7 @@ class Experiment:
         self.pool = pool
 
         # Hard-coded values
-        self._dir_exp = dir_home + '/exp07'
+        self._dir_exp = dir_home + '/exp08'
         dir_output = self._dir_exp + '/outputs'
         self._output_file = dir_output + \
             '/spark-submit/slaves{:02d}_rep{:02d}_{}.txt'
@@ -87,6 +87,8 @@ class Experiment:
 
     def _run_once(self):
         self._start()
+        self._logger.info('{:d} slave(s), repetition {:d}'.format(
+            self.slave_amount, self.repetition))
         self._submit_app()
         self.stop()
 
@@ -153,11 +155,7 @@ class Experiment:
         self.hdfs.save_block_locations(self.hdfs_input, output)
 
     def _upload_input(self):
-        self._logger.info('%d slaves, repetition %d.', self.slave_amount,
-                          self.repetition)
-        pipe = 'pbzip2 -dc ' + self._input_file
-        repl = min(self.slave_amount, 3)
-        self.hdfs.put_from_pipe(self._input_host, pipe, self.hdfs_input, repl)
+        self.hdfs.upload(self._input_host, self._input_file, self.hdfs_input)
         self.hdfs_ex.add_barrier()
         self._save_blocks_info()
 

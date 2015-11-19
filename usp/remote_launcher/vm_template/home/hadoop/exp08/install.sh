@@ -18,7 +18,7 @@ SPARKF="$SPARKD.tgz"
 
 # Legacy experiments
 cd $HOME
-for i in $(seq 1 6); do
+for i in $(seq 1 7); do
     if [ -d exp0$i ]; then
         tar cjf exp0$i.tar.bz2 exp0$i
         rm -rf exp0$i
@@ -41,6 +41,7 @@ if [ ! -d $HOME/hadoop/$HADOOPD ]; then
     ln -s $HADOOPD hadoop
     cd - >/dev/null
 fi
+rm -rf $HOME/hadoop/hadoop/logs/*
 
 #
 # Spark
@@ -57,6 +58,7 @@ if [ ! -d $HOME/spark/$SPARKD ]; then
     ln -s $SPARKD spark
     cd - >/dev/null
 fi
+rm -rf $HOME/spark/spark/logs/*
 
 #
 # Scala

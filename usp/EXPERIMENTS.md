@@ -10,3 +10,7 @@ Same app than exp05, but with 1 GB and 1, 2 and 3 workers.
 exp07
 =====
 HiBench Sort benchmark
+
+exp08
+=====
+HiBench k-means benchmark
