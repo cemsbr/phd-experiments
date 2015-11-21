@@ -4,13 +4,11 @@ from experiment import ExperimentUSP
 from expyrimenter.plugins.pushbullet import Pushbullet
 
 SLAVES_INPUTS = {
-    2: [16384],
-    4: [16384],
-    8: [16384],
-    16: [16384],
-    32: [16384],
-    64: [16384],
-    128: [16384]
+    8: [65536],
+    16: [65536],
+    32: [65536],
+    64: [65536],
+    128: [65536]
 }
 
 eg_slave_amount = sorted(SLAVES_INPUTS.keys())[0]

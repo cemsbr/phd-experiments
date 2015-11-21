@@ -60,7 +60,6 @@ class Experiment:
     def _set_slaves(self, slaves):
         self._slaves = slaves
         self._systems_do(lambda s: s.set_slaves(slaves))
-        self.hibench.set_parallelism(len(slaves) * 2, 'sort')
 
     def run(self):
         self.stop()

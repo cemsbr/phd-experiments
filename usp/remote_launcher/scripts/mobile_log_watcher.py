@@ -3,7 +3,9 @@ from expyrimenter.plugins.pushbullet import Pushbullet
 
 
 filename = 'experiment.log'
-timeout = 5 * 60
+minutes = 5
 title = 'Experiment'
-body = 'Stuck: {} not updated in 5min.'.format(filename)
-Pushbullet().monitor_file(filename, timeout, title, body)
+body = 'Stuck: {} not updated in {:d}min.'.format(filename, minutes)
+
+seconds = minutes * 60
+Pushbullet().monitor_file(filename, seconds, title, body)
