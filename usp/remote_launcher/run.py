@@ -4,19 +4,13 @@ from experiment import ExperimentUSP
 from expyrimenter.plugins.pushbullet import Pushbullet
 
 SLAVES_INPUTS = {
-    1: [32, 64, 128, 256, 512, 1024, 2048, 4096],
-    2: [32, 64, 128, 256, 512, 1024, 2048, 4096],
-    3: [32, 64, 128, 256, 512, 1024, 2048, 4096],
-    4: [32, 64, 128, 256, 512, 1024, 2048, 4096],
-    5: [32, 64, 128, 256, 512, 1024, 2048, 4096],
-    6: [32, 64, 128, 256, 512, 1024, 2048, 4096],
-    7: [32, 64, 128, 256, 512, 1024, 2048, 4096],
-    8: [32, 64, 128, 256, 512, 1024, 2048, 4096]
-    # 16: [16384],
-    # 32: [16384],
-    # 64: [16384],
-    # 123: [16384],
-    # 128: [16384]
+    2: [16384],
+    4: [16384],
+    8: [16384],
+    16: [16384],
+    32: [16384],
+    64: [16384],
+    128: [16384]
 }
 
 eg_slave_amount = sorted(SLAVES_INPUTS.keys())[0]
@@ -35,7 +29,7 @@ else:
 exp = ExperimentUSP()
 exp.set_app('../hibench/hibench/workloads/kmeans/spark/scala/bin/run.sh')
 exp.hdfs_input = '/'
-exp.repetitions = 5
+exp.repetitions = 10
 
 # We might have already run some repetitions for the first input file
 exp.slave_amount = FIRST_SLAVE_AMOUNT
