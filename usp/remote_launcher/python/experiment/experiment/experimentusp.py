@@ -8,7 +8,7 @@ class ExperimentUSP(Experiment):
         # Hard-coded values
         master = 'hadoop0'
         dir_home = '/home/hadoop'
-        input_host = 'hadoop199'
+        input_host = 'hadoop200'
 
         pool = get_slave_pool(128)
         super().__init__(master, dir_home, input_host, pool)

@@ -13,8 +13,8 @@ class LogDownloader:
         self._local_root = local_root
         self.executor = executor if executor else Executor()
 
-        self._cmd_tpl = "ssh {} 'cd {}; tar cjf - {}' | " \
-                "tar xjkf - -C %s/{}" % local_root
+        self._cmd_tpl = "ssh {} 'cd {} && tar cjf - {}' | " \
+                        "tar xjkf - -C %s/{}" % local_root
 
         self._download_list = [{
             'host': launcher_host,
